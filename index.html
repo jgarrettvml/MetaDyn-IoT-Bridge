@@ -4,18 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XIAO Gemini Bridge</title>
+    <title>IoT Bridge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        :root {
+            --metadyn-blue: #0081C9;
+            --metadyn-dark: #004C83;
+            --metadyn-orange: #F29100;
         }
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .text-metadyn-orange { color: var(--metadyn-orange); }
+        .bg-metadyn-orange { background-color: var(--metadyn-orange); }
+        .bg-metadyn-blue { background-color: var(--metadyn-blue); }
+        .border-metadyn-orange { border-color: var(--metadyn-orange); }
     </style>
 <script type="importmap">
 {

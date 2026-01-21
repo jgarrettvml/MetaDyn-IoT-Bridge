@@ -5,10 +5,8 @@ import { geminiLiveService } from './services/geminiLiveService.ts';
 import { ConnectionStatus, ChatMessage } from './types.ts';
 import { 
   Bluetooth, 
-  BluetoothOff, 
   Mic, 
   Activity, 
-  Cpu, 
   Power,
   Wifi,
   Radio,
@@ -60,9 +58,7 @@ const App: React.FC = () => {
       });
       setAiStatus(ConnectionStatus.CONNECTED);
 
-      // Start receiving chunks from XIAO
       await bluetoothService.startNotifications((data) => {
-        // XIAO should send 16-bit PCM at 16kHz
         const pcmData = new Int16Array(data.buffer);
         geminiLiveService.sendAudio(pcmData);
       });
@@ -81,23 +77,29 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-500/30">
-      {/* Decorative Blur */}
-      <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
+    <div className="flex flex-col h-screen bg-[#020617] text-slate-100 font-sans selection:bg-[#F29100]/30">
+      {/* Background Ambience based on Logo Blue */}
+      <div className="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-[#0081C9]/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#004C83]/20 blur-[120px] rounded-full pointer-events-none" />
 
-      {/* Header */}
-      <header className="p-6 flex items-center justify-between border-b border-white/5 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-lg shadow-blue-500/20">
-            <Cpu size={24} className="text-white" />
+      {/* Header with MetaDyn Logo */}
+      <header className="p-4 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-4">
+          <div className="p-1 rounded-xl bg-white/5 ring-1 ring-white/10 shadow-lg shadow-black/20">
+            <img 
+              src="logo.png" 
+              alt="MetaDyn Logo" 
+              className="w-12 h-12 object-contain"
+            />
           </div>
           <div>
-            <h1 className="font-bold text-lg leading-tight">XIAO Bridge</h1>
+            <h1 className="font-bold text-xl tracking-tight text-white flex items-center gap-2">
+              IoT <span className="text-[#0081C9]">Bridge</span>
+            </h1>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <div className={`w-1.5 h-1.5 rounded-full ${btStatus === ConnectionStatus.CONNECTED ? 'bg-green-500 animate-pulse' : 'bg-slate-600'}`} />
-              <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">
-                {btStatus === ConnectionStatus.CONNECTED ? 'System Online' : 'System Offline'}
+              <div className={`w-1.5 h-1.5 rounded-full ${btStatus === ConnectionStatus.CONNECTED ? 'bg-[#F29100] animate-pulse shadow-[0_0_8px_#F29100]' : 'bg-slate-600'}`} />
+              <span className="text-[9px] uppercase tracking-widest font-black text-slate-400">
+                {btStatus === ConnectionStatus.CONNECTED ? 'SECURE LINK' : 'OFFLINE'}
               </span>
             </div>
           </div>
@@ -106,107 +108,135 @@ const App: React.FC = () => {
         {btStatus === ConnectionStatus.CONNECTED ? (
           <button 
             onClick={disconnectBridge}
-            className="p-3 hover:bg-red-500/10 text-red-400 rounded-full transition-all group"
+            className="p-3 hover:bg-red-500/10 text-red-400 rounded-xl transition-all group"
           >
-            <Power size={20} className="group-active:scale-90 transition-transform" />
+            <Power size={22} className="group-active:scale-90 transition-transform" />
           </button>
         ) : (
           <button 
             onClick={connectBridge}
             disabled={btStatus === ConnectionStatus.CONNECTING}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl text-sm font-bold shadow-xl shadow-blue-900/40 flex items-center gap-2 transition-all active:scale-95"
+            className="px-6 py-2.5 bg-[#F29100] hover:bg-[#d98200] disabled:opacity-50 text-white rounded-xl text-sm font-bold shadow-xl shadow-[#F29100]/20 flex items-center gap-2 transition-all active:scale-95 border border-[#F29100]/30"
           >
             {btStatus === ConnectionStatus.CONNECTING ? <RefreshCw className="animate-spin" size={16} /> : <Bluetooth size={16} />}
-            {btStatus === ConnectionStatus.CONNECTING ? 'Searching...' : 'Pair XIAO'}
+            {btStatus === ConnectionStatus.CONNECTING ? 'Pairing...' : 'Pair XIAO'}
           </button>
         )}
       </header>
 
-      {/* Main Experience */}
+      {/* Main Bridge Console */}
       <main className="flex-1 overflow-hidden flex flex-col relative">
         
-        {/* Chat History */}
+        {/* Connection Visualizers */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
-          {messages.length === 0 && !inputTranscript && (
-            <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-40">
-              <Radio size={48} className="animate-pulse" />
-              <p className="text-sm max-w-[200px]">Connected to XIAO S3 Sense. Listening to PDM microphone...</p>
+          {messages.length === 0 && !inputTranscript && !outputTranscript && (
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-8">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#0081C9]/20 blur-3xl rounded-full scale-150 animate-pulse" />
+                <Radio size={72} className="text-[#0081C9] relative z-10 animate-[pulse_2s_infinite]" />
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#F29100] rounded-full animate-ping z-20 shadow-lg shadow-[#F29100]/50"></div>
+              </div>
+              <div className="space-y-3 relative z-10">
+                <p className="text-slate-300 font-bold tracking-tight text-lg">Bridge Awaiting Audio Uplink</p>
+                <p className="text-xs text-slate-500 max-w-[280px] leading-relaxed font-medium">
+                  Streaming secure hardware audio from XIAO S3 Sense via the MetaDyn IoT Gateway.
+                </p>
+              </div>
             </div>
           )}
 
           {messages.map((m) => (
             <div key={m.id} className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}>
-              <div className={`max-w-[85%] p-4 rounded-2xl shadow-sm ${
+              <div className={`max-w-[85%] p-4 rounded-2xl shadow-md border ${
                 m.sender === 'user' 
-                  ? 'bg-blue-600 text-white rounded-tr-none' 
-                  : 'bg-slate-800/80 text-slate-200 border border-white/5 rounded-tl-none'
+                  ? 'bg-[#0081C9] text-white border-[#4DB8E9]/30 rounded-tr-none' 
+                  : 'bg-slate-900/60 text-slate-200 border-white/5 rounded-tl-none backdrop-blur-md'
               }`}>
-                <p className="text-sm leading-relaxed">{m.text}</p>
+                <p className="text-sm leading-relaxed font-medium">{m.text}</p>
               </div>
             </div>
           ))}
 
-          {/* Ghost Transcripts */}
+          {/* Dynamic Transcripts */}
           {inputTranscript && (
-            <div className="flex flex-col items-end opacity-60">
-              <div className="max-w-[85%] p-4 rounded-2xl bg-blue-500/20 text-blue-100 rounded-tr-none border border-blue-500/30">
-                <p className="text-sm italic">{inputTranscript}</p>
+            <div className="flex flex-col items-end opacity-80 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="max-w-[85%] p-4 rounded-2xl bg-[#0081C9]/10 text-[#4DB8E9] rounded-tr-none border border-[#0081C9]/40 backdrop-blur-sm">
+                <p className="text-sm italic font-medium">{inputTranscript}</p>
               </div>
-              <span className="text-[10px] font-bold text-blue-400 mt-2 uppercase flex items-center gap-1">
-                <Mic size={10} className="animate-bounce" /> Transcribing Hardware Audio...
+              <span className="text-[10px] font-black text-[#0081C9] mt-2 uppercase flex items-center gap-1.5 tracking-widest">
+                <Mic size={10} className="animate-bounce" /> Uplink Processing
               </span>
             </div>
           )}
 
           {outputTranscript && (
-            <div className="flex flex-col items-start">
-              <div className="max-w-[85%] p-4 rounded-2xl bg-slate-800 text-slate-300 rounded-tl-none border border-green-500/20">
-                <p className="text-sm italic">{outputTranscript}</p>
+            <div className="flex flex-col items-start animate-in fade-in slide-in-from-left-4 duration-300">
+              <div className="max-w-[85%] p-4 rounded-2xl bg-[#F29100]/5 text-[#F29100] rounded-tl-none border border-[#F29100]/30 backdrop-blur-sm shadow-lg shadow-[#F29100]/5">
+                <p className="text-sm italic font-medium">{outputTranscript}</p>
               </div>
-              <span className="text-[10px] font-bold text-green-400 mt-2 uppercase flex items-center gap-1">
-                <Activity size={10} className="animate-pulse" /> AI Synthesis Active
+              <span className="text-[10px] font-black text-[#F29100] mt-2 uppercase flex items-center gap-1.5 tracking-widest">
+                <Activity size={10} className="animate-pulse" /> MetaDyn AI Downlink
               </span>
             </div>
           )}
           <div ref={chatEndRef} />
         </div>
 
-        {/* Visual Feedback Footer */}
-        <div className="p-8 bg-gradient-to-t from-slate-900 to-transparent">
-          <div className="flex items-center justify-center gap-6">
-            <div className="flex items-center gap-1 h-8">
-              {[...Array(12)].map((_, i) => (
+        {/* Global Visualizer Section */}
+        <div className="p-8 bg-gradient-to-t from-[#020617] via-[#020617]/90 to-transparent">
+          <div className="flex flex-col items-center justify-center gap-5">
+            <div className="flex items-center gap-2 h-12">
+              {[...Array(24)].map((_, i) => (
                 <div 
                   key={i} 
-                  className={`w-1.5 bg-blue-500 rounded-full transition-all duration-150 ${
-                    isAiSpeaking ? 'animate-[bounce_0.5s_infinite]' : 'h-1 opacity-20'
+                  className={`w-1 rounded-full transition-all duration-300 ${
+                    isAiSpeaking ? 'bg-[#F29100] shadow-[0_0_10px_#F29100]' : 'bg-[#0081C9]/30 h-1'
                   }`}
-                  style={{ animationDelay: `${i * 0.05}s`, height: isAiSpeaking ? `${15 + Math.random() * 20}px` : '4px' }}
+                  style={{ 
+                    animation: isAiSpeaking ? `bounce 0.8s infinite` : 'none',
+                    animationDelay: `${i * 0.03}s`, 
+                    height: isAiSpeaking ? `${15 + Math.random() * 30}px` : '4px' 
+                  }}
                 />
               ))}
             </div>
+            <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
+              <span className={`transition-colors duration-500 ${isAiSpeaking ? 'text-slate-700' : 'text-[#0081C9]'}`}>
+                Hardware Ready
+              </span>
+              <div className="w-1 h-1 rounded-full bg-slate-800" />
+              <span className={`transition-colors duration-500 ${isAiSpeaking ? 'text-[#F29100]' : 'text-slate-700'}`}>
+                Downlink Active
+              </span>
+            </div>
           </div>
-          <p className="text-center text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-4">
-            {isAiSpeaking ? 'Gemini Speaking' : btStatus === ConnectionStatus.CONNECTED ? `Tethered to ${deviceName}` : 'Hardware Tether Required'}
-          </p>
         </div>
       </main>
 
-      {/* Floating Status Bar (Mobile-style) */}
-      <nav className="p-4 border-t border-white/5 bg-slate-900/80 backdrop-blur-xl flex justify-around items-center">
-        <div className="flex flex-col items-center gap-1">
-          <div className={`p-2 rounded-lg ${btStatus === ConnectionStatus.CONNECTED ? 'text-blue-400 bg-blue-400/10' : 'text-slate-600'}`}>
+      {/* Hardware Status Bar */}
+      <nav className="p-4 border-t border-white/5 bg-[#020617] flex justify-around items-center">
+        <div className="flex flex-col items-center gap-1.5">
+          <div className={`p-3 rounded-2xl transition-all duration-500 ${btStatus === ConnectionStatus.CONNECTED ? 'text-[#0081C9] bg-[#0081C9]/10 shadow-[inset_0_0_15px_rgba(0,129,201,0.2)]' : 'text-slate-800 bg-slate-900/50'}`}>
             <Wifi size={20} />
           </div>
-          <span className="text-[9px] font-bold uppercase tracking-tighter">BLE Link</span>
+          <span className={`text-[10px] font-black uppercase tracking-widest ${btStatus === ConnectionStatus.CONNECTED ? 'text-[#0081C9]' : 'text-slate-600'}`}>NODE</span>
         </div>
-        <div className="flex flex-col items-center gap-1">
-          <div className={`p-2 rounded-lg ${aiStatus === ConnectionStatus.CONNECTED ? 'text-green-400 bg-green-400/10' : 'text-slate-600'}`}>
+        <div className="flex flex-col items-center gap-1.5">
+          <div className={`p-3 rounded-2xl transition-all duration-500 ${aiStatus === ConnectionStatus.CONNECTED ? 'text-[#F29100] bg-[#F29100]/10 shadow-[inset_0_0_15px_rgba(242,145,0,0.2)]' : 'text-slate-800 bg-slate-900/50'}`}>
             <Activity size={20} />
           </div>
-          <span className="text-[9px] font-bold uppercase tracking-tighter">AI Node</span>
+          <span className={`text-[10px] font-black uppercase tracking-widest ${aiStatus === ConnectionStatus.CONNECTED ? 'text-[#F29100]' : 'text-slate-600'}`}>GATEWAY</span>
         </div>
       </nav>
+
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: scaleY(1); opacity: 0.5; }
+          50% { transform: scaleY(1.8); opacity: 1; }
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 };

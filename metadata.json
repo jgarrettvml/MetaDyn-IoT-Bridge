@@ -1,5 +1,5 @@
 {
-  "name": "XIAO Gemini Voice Bridge",
+  "name": "IoT Bridge",
   "description": "A web-based interface for Seeed Studio XIAO ESP32 S3 Sense that bridges hardware audio to Gemini Live API for real-time AI conversations.",
   "requestFramePermissions": [
     "microphone"
