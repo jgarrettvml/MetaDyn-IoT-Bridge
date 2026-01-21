@@ -64,7 +64,10 @@ export class BluetoothService {
 
     // Fix: Accessing requestDevice through the typed bluetooth property.
     this.device = await navigator.bluetooth.requestDevice({
-      filters: [{ services: [AUDIO_SERVICE_UUID] }],
+      filters: [
+        { namePrefix: 'MetaDynIoT' },
+        { services: [AUDIO_SERVICE_UUID] }
+      ],
     });
 
     if (!this.device) throw new Error('Device not selected');

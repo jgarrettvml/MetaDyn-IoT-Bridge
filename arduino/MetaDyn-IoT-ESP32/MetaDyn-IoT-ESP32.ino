@@ -6,7 +6,7 @@
 #include <BLE2902.h>
 
 // BLE UUIDs must match the web app.
-static const char *DEVICE_NAME = "XIAO ESP32 S3";
+static const char *DEVICE_NAME = "MetaDynIoT_ESP32S3";
 static const char *SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 static const char *CHAR_UUID = "19b10001-e8f2-537e-4f6c-d104768a1214";
 
@@ -55,7 +55,7 @@ void setupBle() {
 
   BLEAdvertising *advertising = BLEDevice::getAdvertising();
   advertising->addServiceUUID(SERVICE_UUID);
-  advertising->setScanResponse(false);
+  advertising->setScanResponse(true);
   advertising->setMinPreferred(0x06);
   advertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
