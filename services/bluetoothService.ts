@@ -64,8 +64,7 @@ export class BluetoothService {
 
     // Fix: Accessing requestDevice through the typed bluetooth property.
     this.device = await navigator.bluetooth.requestDevice({
-      filters: [{ namePrefix: 'XIAO' }],
-      optionalServices: [AUDIO_SERVICE_UUID]
+      filters: [{ services: [AUDIO_SERVICE_UUID] }],
     });
 
     if (!this.device) throw new Error('Device not selected');
