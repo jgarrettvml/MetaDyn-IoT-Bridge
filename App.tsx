@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [aiStatus, setAiStatus] = useState<ConnectionStatus>(ConnectionStatus.DISCONNECTED);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [deviceName, setDeviceName] = useState('');
+  const [btError, setBtError] = useState('');
   const [inputTranscript, setInputTranscript] = useState('');
   const [outputTranscript, setOutputTranscript] = useState('');
   const [isAiSpeaking, setIsAiSpeaking] = useState(false);
@@ -29,6 +30,7 @@ const App: React.FC = () => {
 
   const connectBridge = async () => {
     try {
+      setBtError('');
       setBtStatus(ConnectionStatus.CONNECTING);
       const name = await bluetoothService.connect();
       setDeviceName(name);
@@ -65,6 +67,7 @@ const App: React.FC = () => {
 
     } catch (err) {
       console.error(err);
+      setBtError(err instanceof Error ? err.message : 'Bluetooth connection failed.');
       setBtStatus(ConnectionStatus.ERROR);
     }
   };
@@ -126,6 +129,11 @@ const App: React.FC = () => {
 
       {/* Main Bridge Console */}
       <main className="flex-1 overflow-hidden flex flex-col relative">
+        {btError && (
+          <div className="mx-6 mt-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-200 px-4 py-3 text-xs font-semibold tracking-wide">
+            Bluetooth error: {btError}
+          </div>
+        )}
         
         {/* Connection Visualizers */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">

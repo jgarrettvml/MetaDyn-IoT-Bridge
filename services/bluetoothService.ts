@@ -73,14 +73,26 @@ export class BluetoothService {
     this.server = await this.device.gatt?.connect() || null;
     if (!this.server) throw new Error('Failed to connect to GATT server');
 
-    const service = await this.server.getPrimaryService(AUDIO_SERVICE_UUID);
-    this.characteristic = await service.getCharacteristic(AUDIO_CHAR_UUID);
+    let service: BluetoothRemoteGATTService;
+    try {
+      service = await this.server.getPrimaryService(AUDIO_SERVICE_UUID);
+    } catch (err) {
+      throw new Error('Audio service not found on device.');
+    }
+
+    try {
+      this.characteristic = await service.getCharacteristic(AUDIO_CHAR_UUID);
+    } catch (err) {
+      throw new Error('Audio characteristic not found on device.');
+    }
 
     return this.device.name || 'XIAO ESP32';
   }
 
   async startNotifications(callback: (data: DataView) => void) {
-    if (!this.characteristic) return;
+    if (!this.characteristic) {
+      throw new Error('Audio characteristic not available.');
+    }
     await this.characteristic.startNotifications();
     this.characteristic.addEventListener('characteristicvaluechanged', (event) => {
       // Fix: Casting event.target to BluetoothRemoteGATTCharacteristic to resolve type error on line 41.
