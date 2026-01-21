@@ -87,7 +87,7 @@ const App: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="p-1 rounded-xl bg-white/5 ring-1 ring-white/10 shadow-lg shadow-black/20">
             <img 
-              src="logo.png" 
+              src="/images/logo.png" 
               alt="MetaDyn Logo" 
               className="w-12 h-12 object-contain"
             />
