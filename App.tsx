@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { bluetoothService } from './services/bluetoothService';
-import { geminiLiveService } from './services/geminiLiveService';
-import { ConnectionStatus, ChatMessage } from './types';
+import { bluetoothService } from './services/bluetoothService.ts';
+import { geminiLiveService } from './services/geminiLiveService.ts';
+import { ConnectionStatus, ChatMessage } from './types.ts';
 import { 
   Bluetooth, 
   BluetoothOff, 
